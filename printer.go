@@ -1,3 +1,10 @@
+package printer
+
+import (
+	"image"
+	"image/color"
+)
+
 type Request struct {
 	BgImgPath string
 	FontPath  string
