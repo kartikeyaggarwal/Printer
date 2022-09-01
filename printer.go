@@ -1,39 +1,22 @@
 package printer
 
 import (
-	"image"
-	"image/color"
-
-	"github.com/fogleman/gg"
+	"net/http"
 )
 
-type Request struct {
-	BgImgPath string
-	FontPath  string
-	FontSize  float64
-	Text      string
+var assets Assets
+
+// GCP Cloud Functions requires that the function being deployed be on a file on the root directory
+// The directory in which the code resides inside the Cloud Function is `serverless_function_source_code`
+// That's the reason why in this case we need to append that folder as prefix to our assets
+func init() {
+	assets = Assets{
+		BgImgPath: "serverless_function_source_code/assets/00-instagram-background.png",
+		FontPath:  "serverless_function_source_code/assets/FiraSans-Light.ttf",
+		FontSize:  60,
+	}
 }
 
-func TextOnImg(request Request) (image.Image, error) {
-	bgImage, err := gg.LoadImage(request.BgImgPath)
-	if err != nil {
-		return nil, err
-	}
-	imgWidth := bgImage.Bounds().Dx()
-	imgHeight := bgImage.Bounds().Dy()
-
-	dc := gg.NewContext(imgWidth, imgHeight)
-	dc.DrawImage(bgImage, 0, 0)
-
-	if err := dc.LoadFontFace(request.FontPath, request.FontSize); err != nil {
-		return nil, err
-	}
-
-	x := float64(imgWidth / 2)
-	y := float64((imgHeight / 2) - 80)
-	maxWidth := float64(imgWidth) - 60.0
-	dc.SetColor(color.White)
-	dc.DrawStringWrapped(request.Text, x, y, 0.5, 0.5, maxWidth, 1.5, gg.AlignCenter)
-
-	return dc.Image(), nil
+func Printer(w http.ResponseWriter, r *http.Request) {
+	assets.Serve(w, r)
 }
