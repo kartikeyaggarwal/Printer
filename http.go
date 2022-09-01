@@ -1,4 +1,4 @@
-ackage printer
+package printer
 
 import (
 	"bytes"
